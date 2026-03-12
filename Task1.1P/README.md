@@ -40,8 +40,7 @@ Task1.1P/
 - circuit-schematic.png
 
 ## Demonstration Video
-Video link: Add your YouTube or Panopto link here
-
+Video link: 
 ## Author
 Sachkirat Singh
 SIT210 – Embedded Systems Development
