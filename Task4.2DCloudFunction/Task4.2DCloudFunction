@@ -1,0 +1,100 @@
+#include "thingProperties.h"
+
+// ===== LED Pins =====
+const int livingRoomLed = 5;
+const int bathroomLed = 6;
+const int closetLed = 7;
+
+void setup() {
+  Serial.begin(9600);
+  delay(1500);
+
+  pinMode(livingRoomLed, OUTPUT);
+  pinMode(bathroomLed, OUTPUT);
+  pinMode(closetLed, OUTPUT);
+
+  initProperties();
+  ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+
+  setDebugMessageLevel(2);
+  ArduinoCloud.printDebugInfo();
+
+  // Initial states
+  livingRoomState = false;
+  bathroomState = false;
+  closetState = false;
+
+  digitalWrite(livingRoomLed, LOW);
+  digitalWrite(bathroomLed, LOW);
+  digitalWrite(closetLed, LOW);
+
+  Serial.println("Live cloud lighting system ready.");
+  printStatus();
+}
+
+void loop() {
+  ArduinoCloud.update();
+}
+
+// ===== Messenger / task-required string function path =====
+void onRoomCommandChange() {
+  Serial.print("Command received: ");
+  Serial.println(roomCommand);
+  controlLight(roomCommand);
+}
+
+void controlLight(String room) {
+  if (room == "living room") {
+    livingRoomState = !livingRoomState;
+    onLivingRoomStateChange();
+    Serial.println("Living room light toggled.");
+  }
+  else if (room == "bathroom") {
+    bathroomState = !bathroomState;
+    onBathroomStateChange();
+    Serial.println("Bathroom light toggled.");
+  }
+  else if (room == "closet") {
+    closetState = !closetState;
+    onClosetStateChange();
+    Serial.println("Closet light toggled.");
+  }
+  else {
+    Serial.println("Invalid room name received.");
+  }
+
+  printStatus();
+}
+
+// ===== Live state callbacks for HTML/backend ON/OFF control =====
+void onLivingRoomStateChange() {
+  digitalWrite(livingRoomLed, livingRoomState ? HIGH : LOW);
+  Serial.println("Living room state updated from cloud.");
+  printStatus();
+}
+
+void onBathroomStateChange() {
+  digitalWrite(bathroomLed, bathroomState ? HIGH : LOW);
+  Serial.println("Bathroom state updated from cloud.");
+  printStatus();
+}
+
+void onClosetStateChange() {
+  digitalWrite(closetLed, closetState ? HIGH : LOW);
+  Serial.println("Closet state updated from cloud.");
+  printStatus();
+}
+
+// ===== State feedback =====
+void printStatus() {
+  Serial.print("Living Room: ");
+  Serial.println(livingRoomState ? "ON" : "OFF");
+
+  Serial.print("Bathroom: ");
+  Serial.println(bathroomState ? "ON" : "OFF");
+
+  Serial.print("Closet: ");
+  Serial.println(closetState ? "ON" : "OFF");
+
+  Serial.println("--------------------------");
+}
