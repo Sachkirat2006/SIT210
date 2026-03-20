@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linda's Home Light Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .room-card {
+      background: white;
+      width: 320px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .room-card h2 {
+      margin-top: 0;
+      color: #222;
+    }
+
+    .status {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .status.on {
+      color: green;
+    }
+
+    .status.off {
+      color: red;
+    }
+
+    button {
+      width: 120px;
+      padding: 12px;
+      margin: 5px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .on-btn {
+      background-color: #28a745;
+    }
+
+    .off-btn {
+      background-color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <h1>Linda's Home Light Control</h1>
+
+  <div class="room-card">
+    <h2>Living Room</h2>
+    <div id="living-room-status" class="status off">Current State: OFF</div>
+    <button class="on-btn" onclick="setLightState('living room', 'on')">Turn ON</button>
+    <button class="off-btn" onclick="setLightState('living room', 'off')">Turn OFF</button>
+  </div>
+
+  <div class="room-card">
+    <h2>Bathroom</h2>
+    <div id="bathroom-status" class="status off">Current State: OFF</div>
+    <button class="on-btn" onclick="setLightState('bathroom', 'on')">Turn ON</button>
+    <button class="off-btn" onclick="setLightState('bathroom', 'off')">Turn OFF</button>
+  </div>
+
+  <div class="room-card">
+    <h2>Closet</h2>
+    <div id="closet-status" class="status off">Current State: OFF</div>
+    <button class="on-btn" onclick="setLightState('closet', 'on')">Turn ON</button>
+    <button class="off-btn" onclick="setLightState('closet', 'off')">Turn OFF</button>
+  </div>
+
+  <script>
+    const STATE_API = "http://localhost:3000/api/light-states";
+    const COMMAND_API = "http://localhost:3000/api/set-light";
+
+    function updateStatus(room, isOn) {
+      const idMap = {
+        "living room": "living-room-status",
+        "bathroom": "bathroom-status",
+        "closet": "closet-status"
+      };
+
+      const element = document.getElementById(idMap[room]);
+      element.textContent = `Current State: ${isOn ? "ON" : "OFF"}`;
+      element.className = `status ${isOn ? "on" : "off"}`;
+    }
+
+    async function fetchStates() {
+      try {
+        const response = await fetch(STATE_API);
+        const data = await response.json();
+
+        updateStatus("living room", data["living room"]);
+        updateStatus("bathroom", data["bathroom"]);
+        updateStatus("closet", data["closet"]);
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    }
+
+    async function setLightState(room, action) {
+      try {
+        await fetch(COMMAND_API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ room, action })
+        });
+
+        fetchStates();
+      } catch (error) {
+        console.error("Error sending command:", error);
+      }
+    }
+
+    fetchStates();
+    setInterval(fetchStates, 3000);
+  </script>
+</body>
+</html>
