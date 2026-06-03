@@ -9,8 +9,8 @@ BROKER = "localhost"
 COMMAND_TOPIC = "medicine/command"
 STATUS_TOPIC = "medicine/status"
 
-TAKEN_URL = "PASTE_MEDICINE_TAKEN_IFTTT_URL_HERE"
-MISSED_URL = "PASTE_MEDICINE_MISSED_IFTTT_URL_HERE"
+TAKEN_URL = "https://maker.ifttt.com/trigger/medicine_taken/with/key/CyAkv9Z0Zx"
+MISSED_URL = "https://maker.ifttt.com/trigger/medicine_missed/with/key/CyAkv9Z0"
 
 LOG_FILE = "medicine_log.csv"
 SCHEDULE_FILE = "schedule.csv"
